@@ -1,0 +1,24 @@
+@read1 normal read, quality drops at the end
+GATTTGGGGTTCAAAGCAGT
++
+IIIIIIIHHHHGGGFFF##A
+@read2 perfect quality, 50 percent GC
+ACGTACGTACGTACGTACGT
++
+IIIIIIIIIIIIIIIIIIII
+@read3 all GC
+GGGGCCCCGGGGCCCCGGGG
++
+????????????????????
+@read4 no GC
+ATATATATATATATATATAT
++
+55555555555555555555
+@read5 has N bases with bad quality
+ACGTNNACGTACGTNNACGT
++
+IIII##IIIIIIII##IIII
+@read6 shorter read
+GCGCGCATAT
++
+IIII!!5555
