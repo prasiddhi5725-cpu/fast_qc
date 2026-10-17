@@ -6,6 +6,7 @@ total_bases=0
 n_count=0
 read_length_list=[]
 gc_count=0
+total_score=0
 
 with open(uploaded_file) as open_file:
     for line in open_file:
@@ -18,11 +19,21 @@ with open(uploaded_file) as open_file:
 
         elif line_number % 4==1:
             sequence=line.upper()
-            total_bases+=len(sequence)
-            n_count+=sequence.count("N")
             read_length=len(sequence)
+            read_n=sequence.count("N")
+            read_identifies=read_length-read_n
+            read_gc=sequence.count("G")+sequence.count("C")
+
+            total_bases+=read_length
+            n_count+=read_n
+            
             read_length_list.append(read_length)
-            gc_count+=sequence.count("G")+sequence.count("C")
+            gc_count+=read_gc
+
+            if read_identifies>0:
+                read_gc_percentage=(read_gc)/(read_identifies)*100
+            else:
+                read_gc_percentage=0
     
         elif line_number % 4==2:
             plus=line
@@ -30,6 +41,7 @@ with open(uploaded_file) as open_file:
         elif line_number % 4==3:
             quality_score=line
             read_number=line_number//4 + 1
+            print("GC % for read",read_number,"is: ",read_gc_percentage)
             
             if not header.startswith("@"):
                 print("Read",read_number,": header must start with @ .")
@@ -41,10 +53,25 @@ with open(uploaded_file) as open_file:
                 correct_file=False
                 break
 
+            if read_length!=sequence.count("A")+sequence.count("T")+sequence.count("G")+sequence.count("C")+sequence.count("N"):
+                print("Read",read_number,": has invalid characters in the sequence.")
+                correct_file=False
+                break
+
             if len(sequence)!=len(quality_score):
                 print("Read",read_number,": sequence and quality lengths differ.")
                 correct_file=False
                 break
+
+            individual_score=0
+            for i in quality_score:
+                score=ord(i)-33
+                individual_score+=score
+                total_score+=score
+                    
+            mean_individial_score=individual_score/len(quality_score)
+
+            print("Mean quality of read",read_number,":",round(mean_individial_score,2))
 
         line_number+=1
 
@@ -60,6 +87,8 @@ if correct_file and line_number%4!=0:
 if correct_file:
     total_reads=line_number//4
     actual_bases=total_bases-n_count
+    mean_total_score=total_score/total_bases
+    print("Mean quality of the file:",round(mean_total_score,2))
 
     if actual_bases>0:
         gc_percentage=(gc_count/actual_bases)*100
@@ -79,5 +108,5 @@ if correct_file:
     print("Total number of bases is: ", total_bases)
     print(n_count," bases were unidentified.")
     print(actual_bases,"bases were identified as nucleotide bases.")
-    
+
 
