@@ -1,28 +1,83 @@
 uploaded_file=input("Enter the file name (.fastq format): ")
-open_file=open(uploaded_file)
 
 line_number=0
-for line in open_file:
-    line=line.strip()
+correct_file=True
+total_bases=0
+n_count=0
+read_length_list=[]
+gc_count=0
 
-    if line_number % 4==0:
-        header=line
+with open(uploaded_file) as open_file:
+    for line in open_file:
+        line=line.strip()
+        if line=="":
+            continue
 
-    elif line_number % 4==1:
-        sequence=line
+        if line_number % 4==0:
+            header=line
 
-    elif line_number % 4==2:
-        plus=line
-
-    elif line_number % 4==3:
-        quality_score=line
-
+        elif line_number % 4==1:
+            sequence=line.upper()
+            total_bases+=len(sequence)
+            n_count+=sequence.count("N")
+            read_length=len(sequence)
+            read_length_list.append(read_length)
+            gc_count+=sequence.count("G")+sequence.count("C")
     
-        print(header)
-        print(sequence)
-        print(quality_score)
+        elif line_number % 4==2:
+            plus=line
 
-    line_number+=1
+        elif line_number % 4==3:
+            quality_score=line
+            read_number=line_number//4 + 1
+            
+            if not header.startswith("@"):
+                print("Read",read_number,": header must start with @ .")
+                correct_file=False
+                break
+ 
+            if not plus.startswith("+"):
+                print("Read",read_number,": third line must start with a + .")
+                correct_file=False
+                break
+
+            if len(sequence)!=len(quality_score):
+                print("Read",read_number,": sequence and quality lengths differ.")
+                correct_file=False
+                break
+
+        line_number+=1
 
 
+if correct_file and line_number==0:
+    print("The file is empty.")
+    correct_file=False
+
+if correct_file and line_number%4!=0:
+    print("The number of lines is not a multiple of 4.")
+    correct_file=False
+
+if correct_file:
+    total_reads=line_number//4
+    actual_bases=total_bases-n_count
+
+    if actual_bases>0:
+        gc_percentage=(gc_count/actual_bases)*100
+        print("GC content is:",round(gc_percentage,2),"% .")
+    else:
+        gc_percentage=0
+        print("The file contains only unknown bases.")
+
+    for i in range (len(read_length_list)):
+        print("Read",i+1,"length:", read_length_list[i])
+    
+    print("Maximum read length is: ", max(read_length_list))
+    print("Minimum read length is: ",min(read_length_list))
+    print("The average read length is: ", round(sum(read_length_list)/len(read_length_list),2))
+
+    print("Total number of reads is: ",total_reads)
+    print("Total number of bases is: ", total_bases)
+    print(n_count," bases were unidentified.")
+    print(actual_bases,"bases were identified as nucleotide bases.")
+    
 
