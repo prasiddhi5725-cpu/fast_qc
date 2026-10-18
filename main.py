@@ -1,6 +1,11 @@
-uploaded_file=input("Enter the file name (.fastq format): ")
-
-quality_threshold=20
+def main():
+    uploaded_file=input("Enter the file name (.fastq format): ")
+    quality_threshold=20
+    line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold)
+    if correct_file:
+        print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
+    if not correct_file:
+        print("Warning!! filtered.fastq is incomplete.")
 
 def process_file(filename,quality_threshold):
 
@@ -109,7 +114,7 @@ def process_file(filename,quality_threshold):
         print("The number of lines is not a multiple of 4.")
         correct_file=False
 
-    return line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file
+    return line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file
 
 def calculate_gc(sequence):
     gc=sequence.count("G")+sequence.count("C")
@@ -172,8 +177,7 @@ def print_report(line_number,total_bases,n_count,total_score,gc_count,read_lengt
     print("Quality threshold: ",quality_threshold)
     print("Reads passed: ",passed_reads)
     print("Reads removed: ",low_quality_reads)
-    
-
+ 
     q_20_percentage=(q_20/total_bases)*100
     q_30_percentage=(q_30/total_bases)*100
     print("Bases with Q20 or higher: ", round(q_20_percentage,2),"%")
@@ -191,12 +195,7 @@ def print_report(line_number,total_bases,n_count,total_score,gc_count,read_lengt
     for i in range (len(means)):
         print("Mean of position",i+1,"is:",means[i])
 
-line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold)
-if correct_file:
-    print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
-
-if not correct_file:
-    print("Warning!! filtered.fastq is incomplete.")
+main()
 
 
 
