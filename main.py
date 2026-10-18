@@ -25,6 +25,12 @@ def calculate_gc(sequence):
     identified=len(sequence)-sequence.count("N")
     return gc,identified
 
+def gc_percentage(gc,identified):
+    if identified!=0:
+        return (gc/identified)*100
+    else:
+        return 0
+ 
 def decode_quality(quality):
     scores=[]
     for char in quality:
@@ -36,7 +42,7 @@ def validity(header,sequence,plus,quality_score):
         return "Header must start with @ ."
     if not plus.startswith("+"):
         return "Third line must start with + ."
-    if read_length!=sequence.count("A")+sequence.count("T")+sequence.count("G")+sequence.count("C")+sequence.count("N"):
+    if len(sequence)!=sequence.count("A")+sequence.count("T")+sequence.count("G")+sequence.count("C")+sequence.count("N"):
         return "The sequence contains invalid characters"
     if len(sequence)!=len(quality_score):
         return "Sequence and quality lengths differ"
@@ -59,10 +65,7 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
             read_n=sequence.count("N")
             read_gc, read_identified=calculate_gc(sequence)
 
-            if read_identified>0:
-                read_gc_percentage=read_gc/read_identified*100
-            else:
-                read_gc_percentage=0
+            read_gc_percentage=gc_percentage(read_gc,read_identified)
 
             total_bases+=read_length
             n_count+=read_n
@@ -123,7 +126,6 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
 
         line_number+=1
 
-
 if correct_file and line_number==0:
     print("The file is empty.")
     correct_file=False
@@ -140,10 +142,10 @@ if correct_file:
     print("Mean quality of the file:",round(mean_total_score,2))
 
     if actual_bases>0:
-        gc_percentage=(gc_count/actual_bases)*100
-        print("GC content is:",round(gc_percentage,2),"% .")
+        file_gc_percentage=(gc_count/actual_bases)*100
+        print("GC content is:",round(file_gc_percentage,2),"% .")
     else:
-        gc_percentage=0
+        file_gc_percentage=0
         print("The file contains only unknown bases.")
 
     for i in range (len(read_length_list)):
