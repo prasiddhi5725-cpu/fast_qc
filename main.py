@@ -15,6 +15,9 @@ quality_threshold=20
 low_quality_reads=0
 passed_reads=0
 
+q_20=0
+q_30=0
+
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
@@ -76,7 +79,12 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
                 score=ord(char)-33
                 individual_score+=score
                 total_score+=score
-                    
+
+                if score>=20:
+                    q_20+=1
+                if score>=30:
+                    q_30+=1
+                
             mean_individual_score=individual_score/len(quality_score)
 
             if mean_individual_score<quality_threshold:
@@ -103,6 +111,7 @@ if correct_file and line_number%4!=0:
     correct_file=False
 
 if correct_file:
+
     total_reads=line_number//4
     actual_bases=total_bases-n_count
     mean_total_score=total_score/total_bases
@@ -130,6 +139,11 @@ if correct_file:
     print("Quality threshols: ",quality_threshold)
     print("Reads passed: ",passed_reads)
     print("Reads removed: ",low_quality_reads)
+
+    q_20_percentage=(q_20/total_bases)*100
+    q_30_percentage=(q_30/total_bases)*100
+    print("Bases with Q20 or higher: ", round(q_20_percentage,2),"%")
+    print("Bases with Q30 or higher: ", round(q_30_percentage,2),"%")
 
 if not correct_file:
     print("Warning!! filtered.fastq is incomplete.")
