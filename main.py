@@ -20,6 +20,11 @@ read_gc_list=[]
 position_total=[]
 position_count=[]
 
+def calculate_gc(sequence):
+    gc=sequence.count("G")+sequence.count("C")
+    identified=len(sequence)-sequence.count("N")
+    return gc,identified
+
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
@@ -35,19 +40,18 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
             sequence=line.upper()
             read_length=len(sequence)
             read_n=sequence.count("N")
-            read_identified=read_length-read_n
-            read_gc=sequence.count("G")+sequence.count("C")
+            read_gc, read_identified=calculate_gc(sequence)
+
+            if read_identified>0:
+                read_gc_percentage=read_gc/read_identified*100
+            else:
+                read_gc_percentage=0
 
             total_bases+=read_length
             n_count+=read_n
             
             read_length_list.append(read_length)
             gc_count+=read_gc
-
-            if read_identified>0:
-                read_gc_percentage=(read_gc)/(read_identified)*100
-            else:
-                read_gc_percentage=0
     
         elif line_number % 4==2:
             plus=line
