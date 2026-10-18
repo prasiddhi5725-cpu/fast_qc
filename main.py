@@ -54,6 +54,52 @@ def position_mean(position_total,position_count):
         mean.append(round(position_total[i]/position_count[i],2))
     return mean
 
+def print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count):
+    total_reads=line_number//4
+    actual_bases=total_bases-n_count
+    mean_total_score=total_score/total_bases
+    print("Mean quality of the file:",round(mean_total_score,2))
+    if actual_bases>0:
+        file_gc_percentage=(gc_count/actual_bases)*100
+        print("GC content is:",round(file_gc_percentage,2),"% .")
+    else:
+        file_gc_percentage=0
+        print("The file contains only unknown bases.")
+
+    for i in range (len(read_length_list)):
+        print("Read",i+1,"length:", read_length_list[i])
+        
+    print("Maximum read length is: ", max(read_length_list))
+    print("Minimum read length is: ",min(read_length_list))
+    print("The average read length is: ", round(sum(read_length_list)/len(read_length_list),2))
+
+    print("Total number of reads is: ",total_reads)
+    print("Total number of bases is: ", total_bases)
+    print(n_count," bases were unidentified.")
+    print(actual_bases,"bases were identified as nucleotide bases.")
+    
+    print("Quality threshold: ",quality_threshold)
+    print("Reads passed: ",passed_reads)
+    print("Reads removed: ",low_quality_reads)
+    
+
+    q_20_percentage=(q_20/total_bases)*100
+    q_30_percentage=(q_30/total_bases)*100
+    print("Bases with Q20 or higher: ", round(q_20_percentage,2),"%")
+    print("Bases with Q30 or higher: ", round(q_30_percentage,2),"%")
+
+    minimum_gc=min(read_gc_list)
+    maximum_gc=max(read_gc_list)
+    average_gc=sum(read_gc_list)/len(read_gc_list)
+    print("Minimum GC content: ", round(minimum_gc,2))
+    print("Maximum GC content: ", round(maximum_gc,2))
+    print("Average GC content: ", round(average_gc,2))
+
+    print("Mean quality per position:")
+    means=position_mean(position_total,position_count)
+    for i in range (len(means)):
+        print("Mean of position",i+1,"is:",means[i])
+
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
@@ -141,51 +187,7 @@ if correct_file and line_number%4!=0:
     correct_file=False
 
 if correct_file:
-
-    total_reads=line_number//4
-    actual_bases=total_bases-n_count
-    mean_total_score=total_score/total_bases
-    print("Mean quality of the file:",round(mean_total_score,2))
-
-    if actual_bases>0:
-        file_gc_percentage=(gc_count/actual_bases)*100
-        print("GC content is:",round(file_gc_percentage,2),"% .")
-    else:
-        file_gc_percentage=0
-        print("The file contains only unknown bases.")
-
-    for i in range (len(read_length_list)):
-        print("Read",i+1,"length:", read_length_list[i])
-    
-    print("Maximum read length is: ", max(read_length_list))
-    print("Minimum read length is: ",min(read_length_list))
-    print("The average read length is: ", round(sum(read_length_list)/len(read_length_list),2))
-
-    print("Total number of reads is: ",total_reads)
-    print("Total number of bases is: ", total_bases)
-    print(n_count," bases were unidentified.")
-    print(actual_bases,"bases were identified as nucleotide bases.")
-
-    print("Quality threshold: ",quality_threshold)
-    print("Reads passed: ",passed_reads)
-    print("Reads removed: ",low_quality_reads)
-
-    q_20_percentage=(q_20/total_bases)*100
-    q_30_percentage=(q_30/total_bases)*100
-    print("Bases with Q20 or higher: ", round(q_20_percentage,2),"%")
-    print("Bases with Q30 or higher: ", round(q_30_percentage,2),"%")
-
-    minimum_gc=min(read_gc_list)
-    maximum_gc=max(read_gc_list)
-    average_gc=sum(read_gc_list)/len(read_gc_list)
-    print("Minimum GC content: ", round(minimum_gc,2))
-    print("Maximum GC content: ", round(maximum_gc,2))
-    print("Average GC content: ", round(average_gc,2))
-
-    print("Mean quality per position:")
-    means=position_mean(position_total,position_count)
-    for i in range (len(means)):
-        print("Mean of position",i+1,"is:",means[i])
+    print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
 
 if not correct_file:
     print("Warning!! filtered.fastq is incomplete.")
