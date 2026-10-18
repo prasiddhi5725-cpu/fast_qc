@@ -1,5 +1,8 @@
 uploaded_file=input("Enter the file name (.fastq format): ")
 
+#Todo: Q20/Q30 percentage
+
+
 line_number=0
 correct_file=True
 total_bases=0
@@ -8,9 +11,14 @@ read_length_list=[]
 gc_count=0
 total_score=0
 
-with open(uploaded_file) as open_file:
+quality_threshold=20
+low_quality_reads=0
+passed_reads=0
+
+with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
+        
         if line=="":
             continue
 
@@ -18,10 +26,11 @@ with open(uploaded_file) as open_file:
             header=line
 
         elif line_number % 4==1:
+            original_sequence=line
             sequence=line.upper()
             read_length=len(sequence)
             read_n=sequence.count("N")
-            read_identifies=read_length-read_n
+            read_identified=read_length-read_n
             read_gc=sequence.count("G")+sequence.count("C")
 
             total_bases+=read_length
@@ -30,8 +39,8 @@ with open(uploaded_file) as open_file:
             read_length_list.append(read_length)
             gc_count+=read_gc
 
-            if read_identifies>0:
-                read_gc_percentage=(read_gc)/(read_identifies)*100
+            if read_identified>0:
+                read_gc_percentage=(read_gc)/(read_identified)*100
             else:
                 read_gc_percentage=0
     
@@ -41,8 +50,7 @@ with open(uploaded_file) as open_file:
         elif line_number % 4==3:
             quality_score=line
             read_number=line_number//4 + 1
-            print("GC % for read",read_number,"is: ",read_gc_percentage)
-            
+
             if not header.startswith("@"):
                 print("Read",read_number,": header must start with @ .")
                 correct_file=False
@@ -64,14 +72,24 @@ with open(uploaded_file) as open_file:
                 break
 
             individual_score=0
-            for i in quality_score:
-                score=ord(i)-33
+            for char in quality_score:
+                score=ord(char)-33
                 individual_score+=score
                 total_score+=score
                     
-            mean_individial_score=individual_score/len(quality_score)
+            mean_individual_score=individual_score/len(quality_score)
 
-            print("Mean quality of read",read_number,":",round(mean_individial_score,2))
+            if mean_individual_score<quality_threshold:
+                low_quality_reads+=1
+            else:
+                passed_reads+=1
+                out_file.write(header + "\n")
+                out_file.write(original_sequence + "\n")
+                out_file.write(plus +"\n")
+                out_file.write(quality_score + "\n")
+
+            print("Mean quality of read",read_number,":",round(mean_individual_score,2))
+            print("GC % for read",read_number,"is: ",read_gc_percentage)
 
         line_number+=1
 
@@ -108,5 +126,14 @@ if correct_file:
     print("Total number of bases is: ", total_bases)
     print(n_count," bases were unidentified.")
     print(actual_bases,"bases were identified as nucleotide bases.")
+
+    print("Quality threshols: ",quality_threshold)
+    print("Reads passed: ",passed_reads)
+    print("Reads removed: ",low_quality_reads)
+
+if not correct_file:
+    print("Warning!! filtered.fastq is incomplete.")
+
+
 
 
