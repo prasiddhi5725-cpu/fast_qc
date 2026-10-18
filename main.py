@@ -31,6 +31,17 @@ def decode_quality(quality):
         scores.append(ord(char)-33)
     return scores
 
+def validity(header,sequence,plus,quality_score):
+    if not header.startswith ("@"):
+        return "Header must start with @ ."
+    if not plus.startswith("+"):
+        return "Third line must start with + ."
+    if read_length!=sequence.count("A")+sequence.count("T")+sequence.count("G")+sequence.count("C")+sequence.count("N"):
+        return "The sequence contains invalid characters"
+    if len(sequence)!=len(quality_score):
+        return "Sequence and quality lengths differ"
+    return ""
+
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
@@ -66,23 +77,10 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
             quality_score=line
             read_number=line_number//4 + 1
 
-            if not header.startswith("@"):
-                print("Read",read_number,": header must start with @ .")
-                correct_file=False
-                break
- 
-            if not plus.startswith("+"):
-                print("Read",read_number,": third line must start with a + .")
-                correct_file=False
-                break
-
-            if read_length!=sequence.count("A")+sequence.count("T")+sequence.count("G")+sequence.count("C")+sequence.count("N"):
-                print("Read",read_number,": has invalid characters in the sequence.")
-                correct_file=False
-                break
-
-            if len(sequence)!=len(quality_score):
-                print("Read",read_number,": sequence and quality lengths differ.")
+            error_validity=validity(header,sequence,plus,quality_score)
+            
+            if error_validity!="":
+                print("Read",read_number,":",error_validity)
                 correct_file=False
                 break
 
