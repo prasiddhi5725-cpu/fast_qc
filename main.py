@@ -48,6 +48,12 @@ def validity(header,sequence,plus,quality_score):
         return "Sequence and quality lengths differ"
     return ""
 
+def position_mean(position_total,position_count):
+    mean=[]
+    for i in range(len(position_total)):
+        mean.append(round(position_total[i]/position_count[i],2))
+    return mean
+
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
@@ -177,8 +183,9 @@ if correct_file:
     print("Average GC content: ", round(average_gc,2))
 
     print("Mean quality per position:")
-    for i in range (len(position_total)):
-        print("Position",i+1,":",round(position_total[i]/position_count[i],2))
+    means=position_mean(position_total,position_count)
+    for i in range (len(means)):
+        print("Mean of position",i+1,"is:",means[i])
 
 if not correct_file:
     print("Warning!! filtered.fastq is incomplete.")
