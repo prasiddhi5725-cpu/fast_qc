@@ -17,6 +17,9 @@ q_30=0
 
 read_gc_list=[]
 
+position_total=[]
+position_count=[]
+
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
@@ -74,6 +77,8 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
                 break
 
             individual_score=0
+            position=0
+        
             for char in quality_score:
                 score=ord(char)-33
                 individual_score+=score
@@ -83,6 +88,14 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
                     q_20+=1
                 if score>=30:
                     q_30+=1
+
+                if position==len(position_total):
+                    position_total.append(0)
+                    position_count.append(0)
+
+                position_total[position]+=score
+                position_count[position]+=1
+                position+=1
                 
             mean_individual_score=individual_score/len(quality_score)
 
@@ -152,6 +165,10 @@ if correct_file:
     print("Minimum GC content: ", round(minimum_gc,2))
     print("Maximum GC content: ", round(maximum_gc,2))
     print("Average GC content: ", round(average_gc,2))
+
+    print("Mean quality per position:")
+    for i in range (len(position_total)):
+        print("Position",i+1,":",round(position_total[i]/position_count[i],2))
 
 if not correct_file:
     print("Warning!! filtered.fastq is incomplete.")
