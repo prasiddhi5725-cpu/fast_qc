@@ -25,6 +25,12 @@ def calculate_gc(sequence):
     identified=len(sequence)-sequence.count("N")
     return gc,identified
 
+def decode_quality(quality):
+    scores=[]
+    for char in quality:
+        scores.append(ord(char)-33)
+    return scores
+
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
         line=line.strip()
@@ -82,9 +88,9 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
 
             individual_score=0
             position=0
-        
-            for char in quality_score:
-                score=ord(char)-33
+
+            scores=decode_quality(quality_score)
+            for score in scores:
                 individual_score+=score
                 total_score+=score
 
