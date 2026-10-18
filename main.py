@@ -1,8 +1,5 @@
 uploaded_file=input("Enter the file name (.fastq format): ")
 
-#Todo: Q20/Q30 percentage
-
-
 line_number=0
 correct_file=True
 total_bases=0
@@ -17,6 +14,8 @@ passed_reads=0
 
 q_20=0
 q_30=0
+
+read_gc_list=[]
 
 with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
     for line in open_file:
@@ -99,6 +98,8 @@ with open(uploaded_file) as open_file, open("filtered.fastq","w") as out_file:
             print("Mean quality of read",read_number,":",round(mean_individual_score,2))
             print("GC % for read",read_number,"is: ",read_gc_percentage)
 
+            read_gc_list.append(read_gc_percentage)
+
         line_number+=1
 
 
@@ -136,7 +137,7 @@ if correct_file:
     print(n_count," bases were unidentified.")
     print(actual_bases,"bases were identified as nucleotide bases.")
 
-    print("Quality threshols: ",quality_threshold)
+    print("Quality threshold: ",quality_threshold)
     print("Reads passed: ",passed_reads)
     print("Reads removed: ",low_quality_reads)
 
@@ -144,6 +145,13 @@ if correct_file:
     q_30_percentage=(q_30/total_bases)*100
     print("Bases with Q20 or higher: ", round(q_20_percentage,2),"%")
     print("Bases with Q30 or higher: ", round(q_30_percentage,2),"%")
+
+    minimum_gc=min(read_gc_list)
+    maximum_gc=max(read_gc_list)
+    average_gc=sum(read_gc_list)/len(read_gc_list)
+    print("Minimum GC content: ", round(minimum_gc,2))
+    print("Maximum GC content: ", round(maximum_gc,2))
+    print("Average GC content: ", round(average_gc,2))
 
 if not correct_file:
     print("Warning!! filtered.fastq is incomplete.")
