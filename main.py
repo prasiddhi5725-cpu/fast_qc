@@ -10,7 +10,6 @@ def main():
     uploaded_file=args.input
     quality_threshold=args.threshold
     output_file=args.output
-    print(args)
 
     line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold,output_file)
     if correct_file:
@@ -205,7 +204,8 @@ def print_report(line_number,total_bases,n_count,total_score,gc_count,read_lengt
     for i in range (len(means)):
         print("Mean of position",i+1,"is:",means[i])
 
-main()
+if  __name__=="__main__":
+    main()
 
 
 
