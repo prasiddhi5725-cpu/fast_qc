@@ -1,13 +1,24 @@
+import argparse
+
 def main():
-    uploaded_file=input("Enter the file name (.fastq format): ")
-    quality_threshold=20
-    line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold)
+    parser=argparse.ArgumentParser(description="Upload a file in .fastq format.")
+    parser.add_argument("-i","--input",required=True,help="Input a file in fastq format")
+    parser.add_argument("-t","--threshold",type=int, help="Choose the quality threshold for you file", default=20)
+    parser.add_argument("-o","--output",default="filtered.fastq", help="Output file")
+
+    args=parser.parse_args()
+    uploaded_file=args.input
+    quality_threshold=args.threshold
+    output_file=args.output
+    print(args)
+
+    line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold,output_file)
     if correct_file:
         print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
     if not correct_file:
         print("Warning!! filtered.fastq is incomplete.")
 
-def process_file(filename,quality_threshold):
+def process_file(filename,quality_threshold,output_file):
 
     line_number=0
     correct_file=True
@@ -28,7 +39,7 @@ def process_file(filename,quality_threshold):
     position_total=[]
     position_count=[]
 
-    with open(filename) as open_file, open("filtered.fastq","w") as out_file:
+    with open(filename) as open_file, open(output_file,"w") as out_file:
         for line in open_file:
             line=line.strip()
             
@@ -114,13 +125,12 @@ def process_file(filename,quality_threshold):
         print("The number of lines is not a multiple of 4.")
         correct_file=False
 
-    return line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file
+    return line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file,
 
 def calculate_gc(sequence):
     gc=sequence.count("G")+sequence.count("C")
     identified=len(sequence)-sequence.count("N")
     return gc,identified
-
 def gc_percentage(gc,identified):
     if identified!=0:
         return (gc/identified)*100
