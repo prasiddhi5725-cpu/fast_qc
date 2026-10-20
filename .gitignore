@@ -2,3 +2,4 @@ venv/
 __pycache__/
 filtered.fastq
 result.fastq
+.pytest_cache/

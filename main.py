@@ -148,9 +148,9 @@ def validity(header,sequence,plus,quality_score):
     if not plus.startswith("+"):
         return "Third line must start with + ."
     if len(sequence)!=sequence.count("A")+sequence.count("T")+sequence.count("G")+sequence.count("C")+sequence.count("N"):
-        return "The sequence contains invalid characters"
+        return "The sequence contains invalid characters ."
     if len(sequence)!=len(quality_score):
-        return "Sequence and quality lengths differ"
+        return "Sequence and quality lengths differ ."
     return ""
 
 def position_mean(position_total,position_count):
