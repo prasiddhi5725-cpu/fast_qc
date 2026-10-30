@@ -1,6 +1,6 @@
 import argparse
 import plot
-from plot import plot_position_mean
+from plot import plot_position_mean,plot_read_lengths
 
 def main():
     parser=argparse.ArgumentParser(description="Upload a file in .fastq format.")
@@ -16,9 +16,11 @@ def main():
     line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold,output_file)
     if correct_file:
         print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
-        yaxis_1=list(position_mean(position_total,position_count))
-        xaxis_1=list(range(1,len(yaxis_1)+1))
-        plot_position_mean(xaxis_1,yaxis_1,"Plot per position mean")
+        means=list(position_mean(position_total,position_count))
+        positions=list(range(1,len(means)+1))
+        plot_position_mean(positions,means,"quality_plot.png")
+        plot_read_lengths(read_length_list,"read_length_plot.png")
+
     if not correct_file:
         print("Warning!! filtered.fastq is incomplete.")
 
