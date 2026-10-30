@@ -1,4 +1,6 @@
 import argparse
+import plot
+from plot import plot_position_mean
 
 def main():
     parser=argparse.ArgumentParser(description="Upload a file in .fastq format.")
@@ -14,6 +16,9 @@ def main():
     line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold,output_file)
     if correct_file:
         print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
+        yaxis_1=list(position_mean(position_total,position_count))
+        xaxis_1=list(range(1,len(yaxis_1)+1))
+        plot_position_mean(xaxis_1,yaxis_1,"Plot per position mean")
     if not correct_file:
         print("Warning!! filtered.fastq is incomplete.")
 
@@ -124,7 +129,7 @@ def process_file(filename,quality_threshold,output_file):
         print("The number of lines is not a multiple of 4.")
         correct_file=False
 
-    return line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file,
+    return line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file
 
 def calculate_gc(sequence):
     gc=sequence.count("G")+sequence.count("C")

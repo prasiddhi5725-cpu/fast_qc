@@ -1,8 +1,8 @@
-from main import calculate_gc
-from main import gc_percentage
-from main import decode_quality
-from main import position_mean
-from main import validity
+from program import calculate_gc
+from program import gc_percentage
+from program import decode_quality
+from program import position_mean
+from program import validity
 
 def test_gc():
     assert calculate_gc("AAATTT")==(0,6)
