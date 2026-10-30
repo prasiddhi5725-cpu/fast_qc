@@ -1,6 +1,6 @@
 import argparse
 import plot
-from plot import plot_position_mean,plot_read_lengths
+from plot import plot_position_mean,plot_read_lengths,plot_gc_percentage
 
 def main():
     parser=argparse.ArgumentParser(description="Upload a file in .fastq format.")
@@ -23,6 +23,7 @@ def main():
             positions=list(range(1,len(means)+1))
             plot_position_mean(positions,means,"quality_plot.png")
             plot_read_lengths(read_length_list,"read_length_plot.png")
+            plot_gc_percentage(read_gc_list,"gc_plot.png")
 
     if not correct_file:
         print("Warning!!",output_file,"is incomplete.")

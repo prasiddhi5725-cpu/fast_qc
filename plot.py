@@ -12,11 +12,19 @@ def plot_position_mean(x,y,filename):
     plt.close()
 
 def plot_read_lengths(y,filename):
-    plt.plot(y)
+    plt.hist(y, bins=range(min(y),max(y)+2))
     plt.title("Read length Distribution")
     plt.xlabel("Read length")
     plt.ylabel("Number of reads having read length")
     plt.savefig(filename)
     plt.close()
+
+def plot_gc_percentage(y,filename):
+    plt.hist(y,bins=range(0,101,2))
+    plt.title("GC content per read")
+    plt.xlabel("GC content (%)")
+    plt.ylabel("Number of reads")
+    plt.savefig(filename)
+    plt.close
     
 
