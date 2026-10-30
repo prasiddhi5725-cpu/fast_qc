@@ -5,4 +5,3 @@ result.fastq
 .pytest_cache/
 quality_plot.png
 read_length_plot.png
-

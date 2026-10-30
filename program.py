@@ -7,6 +7,7 @@ def main():
     parser.add_argument("-i","--input",required=True,help="Input a file in fastq format")
     parser.add_argument("-t","--threshold",type=int, help="Choose the quality threshold for you file", default=20)
     parser.add_argument("-o","--output",default="filtered.fastq", help="Output file")
+    parser.add_argument("-plot",action="store_true",help="Save quality and read length plots")
 
     args=parser.parse_args()
     uploaded_file=args.input
@@ -16,13 +17,15 @@ def main():
     line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold,output_file)
     if correct_file:
         print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
-        means=list(position_mean(position_total,position_count))
-        positions=list(range(1,len(means)+1))
-        plot_position_mean(positions,means,"quality_plot.png")
-        plot_read_lengths(read_length_list,"read_length_plot.png")
+
+        if args.plot:
+            means=list(position_mean(position_total,position_count))
+            positions=list(range(1,len(means)+1))
+            plot_position_mean(positions,means,"quality_plot.png")
+            plot_read_lengths(read_length_list,"read_length_plot.png")
 
     if not correct_file:
-        print("Warning!! filtered.fastq is incomplete.")
+        print("Warning!!",output_file,"is incomplete.")
 
 def process_file(filename,quality_threshold,output_file):
 

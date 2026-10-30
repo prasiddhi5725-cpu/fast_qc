@@ -16,7 +16,6 @@ def plot_read_lengths(y,filename):
     plt.title("Read length Distribution")
     plt.xlabel("Read length")
     plt.ylabel("Number of reads having read length")
-    plt.legend()
     plt.savefig(filename)
     plt.close()
     
