@@ -58,7 +58,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python3 program.py -i sample.fastq
+python3 program.py -i test.fastq
 ```
 
 ### Options
@@ -77,13 +77,13 @@ Without `--verbose`, only the summary is printed. This matters on large files, b
 
 ```bash
 # summary only
-python3 program.py -i sample.fastq
+python3 program.py -i test.fastq
 
 # stricter threshold, custom output file, with plots
-python3 program.py -i sample.fastq -t 25 -o strict.fastq --plot
+python3 program.py -i test.fastq -t 25 -o strict.fastq --plot
 
 # print everything, one line per read
-python3 program.py -i sample.fastq --verbose
+python3 program.py -i test.fastq --verbose
 ```
 
 ### Output files
@@ -101,7 +101,7 @@ If a read in the input is invalid, the tool stops, prints which read and why, an
 
 ## Example
 
-Running on the included `sample.fastq` (6 short reads made by hand to test edge cases) gives:
+Running on the included `test.fastq` (6 short reads made by hand to test edge cases) gives:
 
 ```text
 Mean quality of the file: 30.77
@@ -176,7 +176,7 @@ The tests cover the small functions: GC counting, GC percentage, quality decodin
 ├── program.py        # reading, validation, statistics, report, command line
 ├── plot.py           # the three plotting functions
 ├── test_main.py      # pytest tests
-├── sample.fastq      # small hand-made file for trying the tool
+├── test.fastq        # small hand-made file for trying the tool
 ├── requirements.txt
 └── README.md
 ```
