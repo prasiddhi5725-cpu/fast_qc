@@ -1,8 +1,14 @@
-from program import calculate_gc
-from program import gc_percentage
-from program import decode_quality
-from program import position_mean
-from program import validity
+from program import calculate_gc,gc_percentage,decode_quality,position_mean,validity,open_fastq
+import gzip
+import pytest
+
+def test_open_fastq(tmp_path):
+    path=tmp_path/"tiny.fastq.gz"
+    with gzip.open(path,"wt") as f:
+        f.write("@r1\nACGT\n+\nIII\n")
+    with open_fastq(str(path)) as f:
+        assert f.readline()=="@r1\n"
+
 
 def test_gc():
     assert calculate_gc("AAATTT")==(0,6)
