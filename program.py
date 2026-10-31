@@ -1,4 +1,5 @@
 import argparse
+import gzip
 from plot import plot_position_mean,plot_read_lengths,plot_gc_percentage
 
 def main():
@@ -20,12 +21,17 @@ def main():
         if args.plot:
             means=list(position_mean(position_total,position_count))
             positions=list(range(1,len(means)+1))
-            plot_position_mean(positions,means,"example_quality_plot.png")
-            plot_read_lengths(read_length_list,"example_read_length_plot.png")
-            plot_gc_percentage(read_gc_list,"example_gc_plot.png")
+            plot_position_mean(positions,means,"quality_plot.png")
+            plot_read_lengths(read_length_list,"read_length_plot.png")
+            plot_gc_percentage(read_gc_list,"gc_plot.png")
 
     if not correct_file:
         print("Warning!!",output_file,"is incomplete.")
+
+def open_fastq(filename):
+    if filename.endswith(".gz"):
+        return gzip.open(filename,"rt",encoding="utf-8")
+    return open(filename)
 
 def process_file(filename,quality_threshold,output_file,verbose):
 
@@ -48,7 +54,7 @@ def process_file(filename,quality_threshold,output_file,verbose):
     position_total=[]
     position_count=[]
 
-    with open(filename) as open_file, open(output_file,"w") as out_file:
+    with open_fastq(filename) as open_file, open(output_file,"w") as out_file:
         for line in open_file:
             line=line.strip()
             

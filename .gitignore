@@ -6,4 +6,5 @@ result.fastq
 *.png
 !example_*.png
 actual.fastq
+*.gz
 
