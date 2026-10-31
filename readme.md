@@ -8,7 +8,8 @@ I built it as a learning project in plain Python. The parsing, validation and st
 
 ## What it does
 
-- Reads a FASTQ file one read at a time, so large files do not need to fit in memory
+- Reads plain `.fastq` and compressed `.fastq.gz` files
+python3 program.py -i test.fastq.gz
 - Validates every read and stops with a clear message if the file is broken
 - Reports read counts, read lengths, N bases, GC content, and quality statistics
 - Writes a new FASTQ file containing only the reads that pass a mean-quality threshold
@@ -23,10 +24,12 @@ I built it as a learning project in plain Python. The parsing, validation and st
 | Mean quality | Average Phred score over all bases |
 | Q20 / Q30 percentage | Share of bases with Phred score at least 20 / 30 |
 | GC content (file) | (G + C) divided by identified bases, N excluded |
-| GC content (per read) | Same formula for each read, then min, max and average |
+| GC content (per read) | Same formula for each read, then Minimum, Maximum and Average |
 | Read length | Minimum, maximum and average |
 | Mean quality per position | Average score at position 1, 2, 3 and so on across all reads |
 | Reads passed / removed | A read passes if its mean quality is at least the threshold |
+
+Reads made only of N bases are left out of the per-read GC statistics, because they have no G or C information to measure.
 
 ### Validation checks
 
@@ -43,12 +46,14 @@ The tool also reports an empty file, and a file whose line count is not a multip
 
 ## Installation
 
-Requires Python 3.8 or newer.
+Developed and tested with Python 3.14.
 
 ```bash
 git clone https://github.com/prasiddhi5725-cpu/fastq-qc.git
 cd fastq-qc
-pip install -r requirements.txt
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
 `matplotlib` is needed for plots, and `pytest` for the tests. The core analysis uses only the Python standard library.
@@ -78,6 +83,9 @@ Without `--verbose`, only the summary is printed. This matters on large files, b
 ```bash
 # summary only
 python3 program.py -i test.fastq
+
+# compressed input works the same way
+python3 program.py -i test.fastq.gz
 
 # stricter threshold, custom output file, with plots
 python3 program.py -i test.fastq -t 25 -o strict.fastq --plot
@@ -141,7 +149,7 @@ Reads passed (Q >= 20):   901,359
 Reads removed:            2,212
 ```
 
-Run time: Approximately 1 minute 33 seconds
+Run time: about 50 seconds for `python3 program.py -i actual.fastq` (435 MB, 903,571 reads), measured with `time` on a laptop, run from the Windows drive through WSL2.
 
 ### Plots
 
@@ -153,7 +161,7 @@ GC content per read. A single smooth peak around 52 percent.
 
 ![GC content per read](example_gc_plot.png)
 
-Read length distribution. Almost all reads are about 250 bases long, with a short tail of trimmed reads.
+Read length distribution (log scale). Most reads are 250 to 251 bases long. The rest are spread fairly evenly between 35 and 245, which is typical of reads shortened by trimming.
 
 ![Read length distribution](example_read_length_plot.png)
 
@@ -165,7 +173,7 @@ Read length distribution. Almost all reads are about 250 bases long, with a shor
 pytest
 ```
 
-The tests cover the small functions: GC counting, GC percentage, quality decoding, per-position means, and read validation. Expected answers were calculated by hand.
+The tests cover the small functions: GC counting, GC percentage, quality decoding, per-position means, read validation, and opening `.fastq.gz` files. Expected answers were calculated by hand.
 
 ---
 
@@ -186,13 +194,11 @@ The tests cover the small functions: GC counting, GC percentage, quality decodin
 ## Limitations
 
 - Single-end reads only. Paired-end files (two files) are not supported yet.
-- Plain `.fastq` only. Compressed `.fastq.gz` files are not supported yet.
 - Assumes Phred+33 quality encoding, which is what current Illumina data uses.
 - Written in plain Python, so it is much slower than established tools on large files.
 
 ## Planned
 
-- `.fastq.gz` support
 - Paired-end mode
 - A Snakemake workflow to run it on many samples
 
