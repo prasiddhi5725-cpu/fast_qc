@@ -1,5 +1,4 @@
 import argparse
-import plot
 from plot import plot_position_mean,plot_read_lengths,plot_gc_percentage
 
 def main():
@@ -7,16 +6,16 @@ def main():
     parser.add_argument("-i","--input",required=True,help="Input a file in fastq format")
     parser.add_argument("-t","--threshold",type=int, help="Choose the quality threshold for you file", default=20)
     parser.add_argument("-o","--output",default="filtered.fastq", help="Output file")
-    parser.add_argument("-plot",action="store_true",help="Save quality and read length plots")
-
+    parser.add_argument("--plot",action="store_true",help="Save quality and read length plots")
+    parser.add_argument("--verbose",action="store_true",help="Show individual data for all reads")
     args=parser.parse_args()
     uploaded_file=args.input
     quality_threshold=args.threshold
     output_file=args.output
 
-    line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold,output_file)
+    line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,correct_file=process_file(uploaded_file,quality_threshold,output_file,args.verbose)
     if correct_file:
-        print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count)
+        print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,args.verbose)
 
         if args.plot:
             means=list(position_mean(position_total,position_count))
@@ -28,7 +27,7 @@ def main():
     if not correct_file:
         print("Warning!!",output_file,"is incomplete.")
 
-def process_file(filename,quality_threshold,output_file):
+def process_file(filename,quality_threshold,output_file,verbose):
 
     line_number=0
     correct_file=True
@@ -119,11 +118,11 @@ def process_file(filename,quality_threshold,output_file):
                     out_file.write(original_sequence + "\n")
                     out_file.write(plus +"\n")
                     out_file.write(quality_score + "\n")
-
-                print("Mean quality of read",read_number,":",round(mean_individual_score,2))
-                print("GC % for read",read_number,"is: ",read_gc_percentage)
-
                 read_gc_list.append(read_gc_percentage)
+
+                if verbose:    
+                    print("Mean quality of read",read_number,":",round(mean_individual_score,2))
+                    print("GC % for read",read_number,"is: ",read_gc_percentage)
 
             line_number+=1
     
@@ -170,7 +169,7 @@ def position_mean(position_total,position_count):
         mean.append(round(position_total[i]/position_count[i],2))
     return mean
 
-def print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count):
+def print_report(line_number,total_bases,n_count,total_score,gc_count,read_length_list,read_gc_list,quality_threshold,passed_reads,low_quality_reads,q_20,q_30,position_total,position_count,verbose):
     total_reads=line_number//4
     actual_bases=total_bases-n_count
     mean_total_score=total_score/total_bases
@@ -181,9 +180,6 @@ def print_report(line_number,total_bases,n_count,total_score,gc_count,read_lengt
     else:
         file_gc_percentage=0
         print("The file contains only unknown bases.")
-
-    for i in range (len(read_length_list)):
-        print("Read",i+1,"length:", read_length_list[i])
         
     print("Maximum read length is: ", max(read_length_list))
     print("Minimum read length is: ",min(read_length_list))
@@ -210,10 +206,13 @@ def print_report(line_number,total_bases,n_count,total_score,gc_count,read_lengt
     print("Maximum GC content: ", round(maximum_gc,2))
     print("Average GC content: ", round(average_gc,2))
 
-    print("Mean quality per position:")
-    means=position_mean(position_total,position_count)
-    for i in range (len(means)):
-        print("Mean of position",i+1,"is:",means[i])
+    if verbose:
+        for i in range (len(read_length_list)):
+            print("Read",i+1,"length:", read_length_list[i])
+        print("Mean quality per position:")
+        means=position_mean(position_total,position_count)
+        for i in range (len(means)):
+            print("Mean of position",i+1,"is:",means[i])
 
 if  __name__=="__main__":
     main()
