@@ -4,4 +4,6 @@ filtered.fastq
 result.fastq
 .pytest_cache/
 *.png
+!example_*.png
 actual.fastq
+

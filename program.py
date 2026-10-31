@@ -118,7 +118,8 @@ def process_file(filename,quality_threshold,output_file,verbose):
                     out_file.write(original_sequence + "\n")
                     out_file.write(plus +"\n")
                     out_file.write(quality_score + "\n")
-                read_gc_list.append(read_gc_percentage)
+                if read_identified>0:
+                    read_gc_list.append(read_gc_percentage)
 
                 if verbose:    
                     print("Mean quality of read",read_number,":",round(mean_individual_score,2))
@@ -216,7 +217,3 @@ def print_report(line_number,total_bases,n_count,total_score,gc_count,read_lengt
 
 if  __name__=="__main__":
     main()
-
-
-
-
