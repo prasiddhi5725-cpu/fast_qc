@@ -20,9 +20,9 @@ def main():
         if args.plot:
             means=list(position_mean(position_total,position_count))
             positions=list(range(1,len(means)+1))
-            plot_position_mean(positions,means,"quality_plot.png")
-            plot_read_lengths(read_length_list,"read_length_plot.png")
-            plot_gc_percentage(read_gc_list,"gc_plot.png")
+            plot_position_mean(positions,means,"example_quality_plot.png")
+            plot_read_lengths(read_length_list,"example_read_length_plot.png")
+            plot_gc_percentage(read_gc_list,"example_gc_plot.png")
 
     if not correct_file:
         print("Warning!!",output_file,"is incomplete.")
